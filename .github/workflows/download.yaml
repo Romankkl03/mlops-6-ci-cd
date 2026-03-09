@@ -6,33 +6,30 @@ on:
       - main
 
 jobs:
-
   load_image:
     runs-on: ubuntu-latest
     container: ubuntu:22.04
+    environment: downloading
 
     env:
-      MINIO_URL: ${{ secrets.MINIO_URL }}
-      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-      FILE_PATH: ${{ secrets.FILE_PATH }}
-      LOCAL_PATH: ${{ secrets.LOCAL_PATH }}
-      ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      MINIO_URL: ${{ variables.MINIO_URL }}
+      BUCKET_NAME: ${{ variables.BUCKET_NAME }}
+      FILE_PATH: ${{ variables.FILE_PATH }}
+      LOCAL_PATH: ${{ variables.LOCAL_PATH }}
+      ACCESS_KEY: ${{ variables.ACCESS_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      HASH_STRING: ${{ secrets.HASH_STRING }}
+      HASH_STRING: ${{ variables.HASH_STRING }}
 
     steps:
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Install MinIO client
         run: |
           apt-get update
           apt-get install curl -y
-          mkdir -p $HOME/minio-binaries
-          curl https://dl.min.io/client/mc/release/linux-amd64/mc -o $HOME/minio-binaries/mc
-          chmod +x $HOME/minio-binaries/mc
-          export PATH=$PATH:$HOME/minio-binaries
+          curl https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc
+          chmod +x /usr/local/bin/mc
 
       - name: Configure MinIO
         run: |
