@@ -1,0 +1,62 @@
+name: CI Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    container: python:3.8
+    steps:
+      - name: Print greeting
+        run: echo "Hello! My name is $MY_LOGIN. My password is $MY_PASSWORD."
+        env:
+          MY_LOGIN: ${{ secrets.MY_LOGIN }}
+          MY_PASSWORD: ${{ secrets.MY_PASSWORD }}
+
+  lint:
+    runs-on: ubuntu-latest
+    container: python:3.8
+    needs: greeting
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install flake8
+        run: pip install flake8
+
+      - name: Run flake8
+        run: flake8 .
+
+  unit_tests:
+    runs-on: ubuntu-latest
+    container: python:3.8
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest tests/unit
+
+  integration_tests:
+    runs-on: ubuntu-latest
+    container: python:3.8
+    needs: unit_tests
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run integration tests
+        run: pytest tests/integration
