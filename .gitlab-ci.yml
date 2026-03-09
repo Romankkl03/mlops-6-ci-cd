@@ -23,7 +23,6 @@ unit_tests:
   image: python:3.8
   script:
     - pip install -r requirements.txt
-    - pip install pytest
     - pytest tests/unit
   rules:
     - if $CI_MERGE_REQUEST_TARGET_BRANCH == "master"
@@ -33,7 +32,6 @@ integration_tests:
   image: python:3.8
   script:
     - pip install -r requirements.txt
-    - pip install pytest
     - pytest tests/integration
   needs:
     - unit_tests
