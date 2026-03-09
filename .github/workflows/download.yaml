@@ -1,0 +1,47 @@
+name: Download image
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  load_image:
+    runs-on: ubuntu-latest
+    container: ubuntu:22.04
+
+    env:
+      MINIO_URL: ${{ secrets.MINIO_URL }}
+      BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+      FILE_PATH: ${{ secrets.FILE_PATH }}
+      LOCAL_PATH: ${{ secrets.LOCAL_PATH }}
+      ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      HASH_STRING: ${{ secrets.HASH_STRING }}
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install MinIO client
+        run: |
+          apt-get update
+          apt-get install curl -y
+          mkdir -p $HOME/minio-binaries
+          curl https://dl.min.io/client/mc/release/linux-amd64/mc -o $HOME/minio-binaries/mc
+          chmod +x $HOME/minio-binaries/mc
+          export PATH=$PATH:$HOME/minio-binaries
+
+      - name: Configure MinIO
+        run: |
+          mc alias set minio $MINIO_URL $ACCESS_KEY $SECRET_KEY
+
+      - name: Download image
+        run: |
+          mc cp minio/$BUCKET_NAME/$FILE_PATH $LOCAL_PATH
+
+      - name: Check md5
+        run: |
+          echo "$HASH_STRING $LOCAL_PATH" | md5sum -c
