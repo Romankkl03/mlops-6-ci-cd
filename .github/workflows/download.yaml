@@ -12,13 +12,13 @@ jobs:
     environment: downloading
 
     env:
-      MINIO_URL: ${{ variables.MINIO_URL }}
-      BUCKET_NAME: ${{ variables.BUCKET_NAME }}
-      FILE_PATH: ${{ variables.FILE_PATH }}
-      LOCAL_PATH: ${{ variables.LOCAL_PATH }}
-      ACCESS_KEY: ${{ variables.ACCESS_KEY }}
+      MINIO_URL: ${{ vars.MINIO_URL }}
+      BUCKET_NAME: ${{ vars.BUCKET_NAME }}
+      FILE_PATH: ${{ vars.FILE_PATH }}
+      LOCAL_PATH: ${{ vars.LOCAL_PATH }}
+      ACCESS_KEY: ${{ vars.ACCESS_KEY }}
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      HASH_STRING: ${{ variables.HASH_STRING }}
+      HASH_STRING: ${{ vars.HASH_STRING }}
 
     steps:
 
